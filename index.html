@@ -1,0 +1,635 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>PBE Player Creator</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="apple-touch-icon" href="icon.png">
+    <!-- Place favicon.ico in the root directory -->
+
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+    <link rel="stylesheet" href="css/style.css">
+    <!--<link rel="stylesheet" href="css/normalize.css">-->
+    <!--<link rel="stylesheet" href="css/main.css">-->
+
+    <link rel="shortcut icon" type="image/png" href="resources/favicon.png"/>
+</head>
+<body>
+<!--[if lte IE 9]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<script src="js/vendor/modernizr-3.5.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.2.1.min.js"><\/script>')</script>
+<script src="js/plugins.js"></script>
+<script src="js/main.js"></script>
+<script type="text/javascript" src="js/materialize.min.js"></script>
+<script src="js/archetypes.js"></script>
+<script src="js/calculations.js"></script>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script>
+    window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;
+    ga('create','UA-XXXXX-Y','auto');ga('send','pageview')
+
+    $(document).ready(function() {
+        $('#fieldingArchetype').material_select();
+        $('#battingArchetype').material_select();
+        $('#pitchingArchetype').material_select();
+        $('#vel').material_select();
+        $('#pit2').material_select();
+        $('#pit3').material_select();
+        $('#pit4').material_select();
+    });
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+<h3 class="center aligned">PBE Player Builder</h3>
+<div class="col s12">
+    <ul class="tabs center aligned">
+        <li class="tab col s3"><a class="active" href="#batterTab">Batter</a></li>
+        <li class="tab col s3"><a class="active" href="#pitcherTab">Pitcher</a></li>
+    </ul>
+</div>
+<div id="batterTab">
+    <div class="row">
+        <div class="col l3"></div>
+        <div class="col s12 l6">
+            <table id="battingTPETable" class="bordered centered" style="padding: 0px; margin: 0px;">
+                <tr>
+                    <td>Earned TPE </td>
+                    <td> <input   value="100" type="number" min="100" default="100" step="1" id="earnedHitterTPE" onchange='totalBatterTPE()'/></td>
+                </tr>
+                <tr>
+                    <td>TPE in fielding:  </td>
+                    <td> <b><span id="fieldingTPE">0</span></b></td>
+                </tr>
+                <tr>
+                    <td>TPE in batting: </td>
+                    <td> <b><span id="battingTPE">0</span></b></td>
+                </tr>
+                <tr>
+                    <td>TPE Avalaible:  </td>
+                    <td>  <b><span id="hitterTPE">100</span></b></td>
+                </tr>
+            </table>
+            <ul class="collapsible" data-collapsible="expandable">
+                <li>
+                    <div class="collapsible-header"><i class="material-icons">info</i>Update Scale</div>
+                    <div class="collapsible-body"><span><p class="center aligned">
+                        1-40: 1 TPE Per Point<br>
+                        40-50: 2 TPE Per Point<br>
+                        50-60: 3 TPE Per Point<br>
+                        60-70: 4 TPE Per Point<br>
+                        70-80: 6 TPE Per Point<br>
+                        80-90: 7 TPE Per Point<br>
+                        90-115: 8 TPE Per Point<br>
+                    </p></span></div>
+                </li>
+                <li>
+                    <div class="collapsible-header active"><i class="material-icons">edit</i>Fielding Attributes</div>
+                    <div class="collapsible-body"><span>
+            <table id="fieldingStats" class="bordered centered " style="padding: 0px; margin: 0px;">
+                <th colspan="5" style="min-width: 100px">
+                    <select id="fieldingArchetype" onchange='changeFieldingArchetype()'>
+                        <option>Select fielding archetype for your player</option>
+                        <option>Strong Arm Fielder (eg. Manny Machado)</option>
+                        <option>Quick Fielder (eg. Jose Altuve)</option>
+                        <option>Balanced Fielder (eg. Adrian Beltre)</option>
+                        <option>React Catcher (eg. Buster Posey)</option>
+                        <option>Strong Arm Catcher (eg. Yadier Molina)</option>
+                        <option>Designated Hitter (eg. Khris Davis) - can spent 100 starting TPE in batting</option>
+                    </select>
+                </th>
+                <tr>
+                    <td><b>Skill</b></td>
+                    <td><b>Base</b></td>
+                    <td><b>Points</b></td>
+                    <td><b>Cost</b></td>
+                    <td><b>Max</b></td>
+                </tr>
+                <tr>
+                    <td>Fielding Range</td>
+                    <td><span id="irMin">0</span></td>
+                    <td><input type="number" min="5" max="100" default="5" step="1" id="ir" onchange='skillChange("ir")'/></td>
+                    <td><span id="irTpe">0</span></td>
+                    <td><span id="irMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Fielding Error</td>
+                    <td><span id="ieMin">0</span></td>
+                    <td><input type="number" min="5" max="100" step="1" id="ie" onchange='skillChange("ie")' /></td>
+                    <td><span id="ieTpe">0</span></td>
+                    <td><span id="ieMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Fielding Arm</td>
+                    <td><span id="iaMin">0</span></td>
+                    <td><input type="number" min="5" max="100" step="1" id="ia" onchange='skillChange("ia")' /></td>
+                    <td><span id="iaTpe">0</span></td>
+                    <td><span id="iaMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Turn Double Play</td>
+                    <td><span id="dpMin">0</span></td>
+                    <td><input type="number" min="5" max="100" step="1" id="dp" onchange='skillChange("dp")' /></td>
+                    <td><span id="dpTpe">0</span></td>
+                    <td><span id="dpMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Catchers Ability</td>
+                    <td><span id="cabMin">0</span></td>
+                    <td><input type="number" min="5" max="100" step="1" id="cab" onchange='skillChange("cab")' /></td>
+                    <td><span id="cabTpe">0</span></td>
+                    <td><span id="cabMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Catchers Arm</td>
+                    <td><span id="caMin">0</span></td>
+                    <td><input type="number" min="5" max="100" step="1" id="ca" onchange='skillChange("ca")' /></td>
+                    <td><span id="caTpe">0</span></td>
+                    <td><span id="caMax">110</span></td>
+                </tr>
+                <tr hidden="true">
+                    <td>Outfield Range</td>
+                    <td><span id="orMin">0</span></td>
+                    <td><input type="number" min="5" max="100" step="1" id="or" onchange='skillChange("or")' /></td>
+                    <td><span id="orTpe">0</span></td>
+                    <td><span id="orMax">110</span></td>
+                </tr>
+                <tr hidden="true">
+                    <td>Outfield Error</td>
+                    <td><span id="oeMin">0</span></td>
+                    <td><input type="number" min="5" max="100" step="1" id="oe" onchange='skillChange("oe")' /></td>
+                    <td><span id="oeTpe">0</span></td>
+                    <td><span id="oeMax">110</span></td>
+                </tr>
+                <tr hidden="true">
+                    <td>Outfield Arm</td>
+                    <td><span id="oaMin">0</span></td>
+                    <td><input type="number" min="5" max="100" step="1" id="oa" onchange='skillChange("oa")' /></td>
+                    <td><span id="oaTpe">0</span></td>
+                    <td><span id="oaMax">110</span></td>
+                </tr>
+            </table>
+        </span></div>
+                </li>
+                <li>
+                    <div class="collapsible-header active"><i class="material-icons">whatshot</i>Batting Attributes</div>
+                    <div class="collapsible-body"><span>
+            <table id="battingStats" class="bordered centered  centered" style="padding: 3px; margin: 0px;">
+                <th colspan="5" style="min-width: 100px">
+                    <select id="battingArchetype" onchange='changeBattingArchetype()'>
+                        <option>Select batting archetype for your player</option>
+                        <option>Power Hitter (eg. Aaron Judge)</option>
+                        <option>Contact Hitter (eg. Ichiro Suzuki)</option>
+                        <option>Speed Demon (eg. Billy Hamilton)</option>
+                        <option>Balanced Batter (eg. Manny Machado)</option>
+                    </select>
+                </th>
+                <tr>
+                    <td><b>Skill</b></td>
+                    <td><b>Base</b></td>
+                    <td><b>Points</b></td>
+                    <td><b>Cost</b></td>
+                    <td><b>Max</b></td>
+                </tr>
+                <tr>
+                    <td>BABIP vs RHP</td>
+                    <td><span id="barMin">0</span></td>
+                    <td><input type="number" min="5" max="100" default="5" step="1" id="bar" onchange='skillChange("bar")'/></td>
+                    <td><span id="barTpe">0</span></td>
+                    <td><span id="barMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>BABIP vs LHP</td>
+                    <td><span id="balMin">0</span></td>
+                    <td><input type="number" min="5" max="100" default="5" step="1" id="bal" onchange='skillChange("bal")'/></td>
+                    <td><span id="balTpe">0</span></td>
+                    <td><span id="balMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Gap vs RHP</td>
+                    <td><span id="garMin">0</span></td>
+                    <td><input type="number" min="5" max="100" default="5" step="1" id="gar" onchange='skillChange("gar")'/></td>
+                    <td><span id="garTpe">0</span></td>
+                    <td><span id="garMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Gap vs LHP</td>
+                    <td><span id="galMin">0</span></td>
+                    <td><input type="number" min="5" max="100" default="5" step="1" id="gal" onchange='skillChange("gal")'/></td>
+                    <td><span id="galTpe">0</span></td>
+                    <td><span id="galMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Power vs RHP</td>
+                    <td><span id="porMin">0</span></td>
+                    <td><input type="number" min="5" max="100" default="5" step="1" id="por" onchange='skillChange("por")'/></td>
+                    <td><span id="porTpe">0</span></td>
+                    <td><span id="porMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Power vs LHP</td>
+                    <td><span id="polMin">0</span></td>
+                    <td><input type="number" min="5" max="100" default="5" step="1" id="pol" onchange='skillChange("pol")'/></td>
+                    <td><span id="polTpe">0</span></td>
+                    <td><span id="polMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Eye/Patience vs RHP</td>
+                    <td><span id="eprMin">0</span></td>
+                    <td><input type="number" min="5" max="100" default="5" step="1" id="epr" onchange='skillChange("epr")'/></td>
+                    <td><span id="eprTpe">0</span></td>
+                    <td><span id="eprMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Eye/Patience vs LHP</td>
+                    <td><span id="eplMin">0</span></td>
+                    <td><input type="number" min="5" max="100" default="5" step="1" id="epl" onchange='skillChange("epl")'/></td>
+                    <td><span id="eplTpe">0</span></td>
+                    <td><span id="eplMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Running Speed & Baserunning</td>
+                    <td><span id="runMin">0</span></td>
+                    <td><input type="number" min="5" max="120" default="5" step="1" id="run" onchange='skillChange("run")'/></td>
+                    <td><span id="runTpe">0</span></td>
+                    <td><span id="runMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Stealing Ability</td>
+                    <td><span id="steMin">0</span></td>
+                    <td><input type="number" min="5" max="120" default="5" step="1" id="ste" onchange='skillChange("ste")'/></td>
+                    <td><span id="steTpe">0</span></td>
+                    <td><span id="steMax">110</span></td>
+                </tr>
+                <tr hidden="true">
+                    <td>Baserunning Skills</td>
+                    <td><span id="basMin">0</span></td>
+                    <td><input type="number" min="5" max="120" default="5" step="1" id="bas" onchange='skillChange("bas")'/></td>
+                    <td><span id="basTpe">0</span></td>
+                    <td><span id="basMax">110</span></td>
+                </tr>
+                <tr hidden="true">
+                    <td>Sacrifice Bunting</td>
+                    <td><span id="sacMin">0</span></td>
+                    <td><input type="number" min="5" max="120" default="5" step="1" id="sac" onchange='skillChange("sac")'/></td>
+                    <td><span id="sacTpe">0</span></td>
+                    <td><span id="sacMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Bunting</td>
+                    <td><span id="bunMin">0</span></td>
+                    <td><input type="number" min="5" max="120" default="5" step="1" id="bun" onchange='skillChange("bun")'/></td>
+                    <td><span id="bunTpe">0</span></td>
+                    <td><span id="bunMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Avoid K's vs RHP</td>
+                    <td><span id="akrMin">0</span></td>
+                    <td><input type="number" min="5" max="100" default="5" step="1" id="akr" onchange='skillChange("akr")'/></td>
+                    <td><span id="akrTpe">0</span></td>
+                    <td><span id="akrMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Avoid K's vs LHP</td>
+                    <td><span id="aklMin">0</span></td>
+                    <td><input type="number" min="5" max="100" default="5" step="1" id="akl" onchange='skillChange("akl")'/></td>
+                    <td><span id="aklTpe">0</span></td>
+                    <td><span id="aklMax">110</span></td>
+                </tr>
+            </table>
+        </span></div>
+                </li>
+                <!--<li>-->
+                    <!--<div class="collapsible-header"><i class="material-icons">info</i>Batting Update Scale</div>-->
+                    <!--<div class="collapsible-body"><span><p class="center aligned">-->
+                        <!--BABIP/Gap/Power/Eye/Avoid K's:<br>-->
+                <!--1-30: 2 TPE Per Point<br>-->
+                <!--30-80: 4 TPE Per Point<br>-->
+                <!--80-100: 6 TPE Per Point<br><br>-->
+
+                        <!--Running/Stealing/Baserunning/Sac Bunting/Bunting for a Hit:<br>-->
+                        <!--1-60: 1 TPE Per Point<br>-->
+                        <!--60-70: 2 TPE Per Point<br>-->
+                        <!--70-80: 3 TPE Per Point<br>-->
+                        <!--80-90: 4 TPE Per Point<br>-->
+                        <!--90-120: 5 TPE Per Point<br>-->
+            <!--</p></span></div>-->
+                <!--</li>-->
+            </ul>
+        </div>
+    </div>
+    <!--<div class="row">-->
+    <!--<div class="col l3"></div>-->
+    <!--<div class="col s12 l6">-->
+    <!--<ul class="collapsible" data-collapsible="expandable">-->
+
+    <!--&lt;!&ndash;<li>&ndash;&gt;-->
+    <!--&lt;!&ndash;<div class="collapsible-header"><i class="material-icons">info</i>Specialized Skills Update Scale</div>&ndash;&gt;-->
+    <!--&lt;!&ndash;<div class="collapsible-body"><span><p class="center aligned">&ndash;&gt;-->
+    <!--&lt;!&ndash;1-60: 1 TPE Per Point<br>&ndash;&gt;-->
+    <!--&lt;!&ndash;60-70: 2 TPE Per Point<br>&ndash;&gt;-->
+    <!--&lt;!&ndash;70-80: 3 TPE Per Point<br>&ndash;&gt;-->
+    <!--&lt;!&ndash;80-90: 4 TPE Per Point<br>&ndash;&gt;-->
+    <!--&lt;!&ndash;90-120: 5 TPE Per Point<br>&ndash;&gt;-->
+    <!--&lt;!&ndash;</p></span></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;</li>&ndash;&gt;-->
+    <!--&lt;!&ndash;<li>&ndash;&gt;-->
+    <!--&lt;!&ndash;<div class="collapsible-header active"><i class="material-icons">fitness_center</i>Specialized Skills</div>&ndash;&gt;-->
+    <!--&lt;!&ndash;<div class="collapsible-body"><span>&ndash;&gt;-->
+    <!--&lt;!&ndash;<table id="specStats" class="bordered highlight centered  centered" style="padding: 3px; margin: 0px;">&ndash;&gt;-->
+    <!--&lt;!&ndash;<tr>&ndash;&gt;-->
+    <!--&lt;!&ndash;<td><b>Skill</b></td>&ndash;&gt;-->
+    <!--&lt;!&ndash;<td><b>Base</b></td>&ndash;&gt;-->
+    <!--&lt;!&ndash;<td><b>Points</b></td>&ndash;&gt;-->
+    <!--&lt;!&ndash;<td><b>Cost</b></td>&ndash;&gt;-->
+    <!--&lt;!&ndash;<td><b>Max</b></td>&ndash;&gt;-->
+    <!--&lt;!&ndash;</tr>&ndash;&gt;-->
+    <!--&lt;!&ndash;</table>&ndash;&gt;-->
+    <!--&lt;!&ndash;</span>&ndash;&gt;-->
+    <!--&lt;!&ndash;</div>&ndash;&gt;-->
+    <!--</ul>-->
+    <!--</div>-->
+    <!--</div>-->
+</div>
+<div id="pitcherTab">
+    <div class="row">
+        <div class="col l3"></div>
+        <div class="col s12 l6">
+            <table id="pitcherTPETable" class="bordered centered " style="padding: 0px; margin: 0px;">
+                <tr>
+                    <td>Earned TPE </td>
+                    <td> <input value="100" type="number" min="100" default="100" step="1" id="earnedPitcherTPE" onchange='totalPitcherTPE()'/></td>
+                </tr>
+                <tr>
+                    <td>TPE spent:  </td>
+                    <td> <b><span id="pitchingTPE">0</span></b></td>
+                </tr>
+                <tr>
+                    <td>TPE avalaible:  </td>
+                    <td>  <b><span id="pitchingBalance">100</span></b></td>
+                </tr>
+            </table>
+            <ul class="collapsible" data-collapsible="expandable">
+                <li>
+                    <div class="collapsible-header"><i class="material-icons">info</i>Pitching Update Scale</div>
+                    <div class="collapsible-body"><span><p class="center aligned">
+                1-40: 1 TPE Per Point<br>
+                40-50: 2 TPE Per Point<br>
+                50-60: 3 TPE Per Point<br>
+                60-70: 4 TPE Per Point<br>
+                70-80: 6 TPE Per Point<br>
+                80-90: 7 TPE Per Point<br>
+                90-115: 8 TPE Per Point<br>
+                        Pitchers have the ability to buy 4th pitch for 50 TPE, eligible choices are listed in their player template cards - from the same pool as 2nd and 3rd pitch. Pitch starts at 40 rating and can be upgraded up to 60.<br>
+            </p></span></div>
+                </li>
+                <li>
+                    <div class="collapsible-header active"><i class="material-icons">center_focus_weak</i>Pitching Attributes</div>
+                    <div class="collapsible-body"><span>
+            <table id="pitchingStats" class="bordered centered " style="padding: 3px; margin: 0px;">
+                <th colspan="5" style="min-width: 100px">
+                    <select id="pitchingArchetype" onchange='changePitchingArchetype()'>
+                        <option>Select pitching archetype for your player</option>
+                        <option>Power Starting Pitcher (eg. Luis Severino)</option>
+                        <option>Balanced Starting Pitcher (eg. Chris Sale, Corey Kluber)</option>
+                        <option>Finesse Starting Pitcher (eg. Dallas Keuchel, Masahiro Tanaka)</option>
+                        <option>Knuckleball Starting Pitcher (eg. R.A Dickey)</option>
+                        <option>Power Closer (eg. Aroldis Chapman)</option>
+                        <option>Balanced Closer (eg. Andrew Miller)</option>
+                        <option>Finesse Closer (eg. Brad Ziegler)</option>
+                        <option>Middle Reliever (eg. Chris Devenski, Archie Bradley)</option>
+                    </select>
+                </th>
+                <tr>
+                    <td><b>Skill</b></td>
+                    <td><b>Base</b></td>
+                    <td><b>Points</b></td>
+                    <td><b>Cost</b></td>
+                    <td><b>Max</b></td>
+                </tr>
+                <tr>
+                    <td>Velocity</td>
+                    <td><span id="velMin">80 - 83</span></td>
+                    <td style="width: 65px;">
+                        <select id="vel" onchange='skillChange("vel")'>
+                            <option value="0">80 - 83</option>
+                            <option value="30">83 - 85</option>
+                            <option value="60">84 - 86</option>
+                            <option value="90">85 - 87</option>
+                            <option value="120">86 - 88</option>
+                            <option value="150">87 - 89</option>
+                            <option value="180">88 - 90</option>
+                            <option value="210">89 - 91</option>
+                            <option value="260">90 - 92</option>
+                            <option value="310">91 - 93</option>
+                            <option value="360">92 - 94</option>
+                            <option value="410">93 - 95</option>
+                            <option value="460">94 - 96</option>
+                            <option value="510">95 - 97</option>
+                            <option value="585">96 - 98</option>
+                            <option value="660">97 - 99</option>
+                            <option value="735">98 - 100</option>
+                            <option value="810">99 - 101</option>
+                            <option value="885">100+</option>
+                        </select>
+                    </td>
+                    <td><span id="velTpe">0</span></td>
+                    <td><span id="velMax">110</span></td>
+                </tr>
+                <tr>
+                    <td>Movement vs. RHB</td>
+                    <td><span id="mvrMin">0</span></td>
+                    <td><input type="number" min="5" max="115" default="5" step="1" id="mvr" onchange='skillChange("mvr")'/></td>
+                    <td><span id="mvrTpe">0</span></td>
+                    <td><span id="mvrMax">115</span></td>
+                </tr>
+                <tr>
+                    <td>Movement vs. LHB</td>
+                    <td><span id="mvlMin">0</span></td>
+                    <td><input type="number" min="5" max="115" default="5" step="1" id="mvl" onchange='skillChange("mvl")'/></td>
+                    <td><span id="mvlTpe">0</span></td>
+                    <td><span id="mvlMax">115</span></td>
+                </tr>
+                <tr>
+                    <td>Control vs. RHB</td>
+                    <td><span id="ctrMin">0</span></td>
+                    <td><input type="number" min="5" max="115" default="5" step="1" id="ctr" onchange='skillChange("ctr")'/></td>
+                    <td><span id="ctrTpe">0</span></td>
+                    <td><span id="ctrMax">115</span></td>
+                </tr>
+                <tr>
+                    <td>Control vs. LHB</td>
+                    <td><span id="ctlMin">0</span></td>
+                    <td><input type="number" min="5" max="115" default="5" step="1" id="ctl" onchange='skillChange("ctl")'/></td>
+                    <td><span id="ctlTpe">0</span></td>
+                    <td><span id="ctlMax">115</span></td>
+                </tr>
+                <tr>
+                    <td>Stamina</td>
+                    <td><span id="staMin">0</span></td>
+                    <td><input type="number" min="5" max="115" default="5" step="1" id="sta" onchange='skillChange("sta")'/></td>
+                    <td><span id="staTpe">0</span></td>
+                    <td><span id="staMax">115</span></td>
+                </tr>
+                <tr>
+                    <td>Holding Runners</td>
+                    <td><span id="hdrMin">0</span></td>
+                    <td><input type="number" min="5" max="115" default="5" step="1" id="hdr" onchange='skillChange("hdr")'/></td>
+                    <td><span id="hdrTpe">0</span></td>
+                    <td><span id="hdrMax">115</span></td>
+                </tr>
+                <tr>
+                    <td>Fastball Rating</td>
+                    <td><span id="fbrMin">0</span></td>
+                    <td><input type="number" min="5" max="115" default="5" step="1" id="fbr" onchange='skillChange("fbr")'/></td>
+                    <td><span id="fbrTpe">0</span></td>
+                    <td><span id="fbrMax">115</span></td>
+                </tr>
+                <tr>
+                    <td>Pitch 2</td>
+                    <td></td>
+                    <td colspan="2" style="max-width: 150px;">
+                        <select id="pit2" onchange='skillChange("pit2")'>
+                            <option>Select 2nd pitch</option>
+                            <option>Sinker</option>
+                            <option>Cutter</option>
+                            <option>Curveball</option>
+                            <option>Slider</option>
+                            <option>Changeup</option>
+                            <option>Splitter</option>
+                            <option>Forkball</option>
+                            <option>Circle Change</option>
+                            <option>Screwball</option>
+                        </select>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Pitch 2 Rating</td>
+                    <td><span id="scrMin">0</span></td>
+                    <td><input type="number" min="5" max="115" default="5" step="1" id="scr" onchange='skillChange("scr")'/></td>
+                    <td><span id="scrTpe">0</span></td>
+                    <td><span id="scrMax">115</span></td>
+                </tr>
+                <tr>
+                    <td>Pitch 3</td>
+                    <td></td>
+                    <td colspan="2" style="max-width: 150px;">
+                        <select id="pit3" onchange='skillChange("pit3")'>
+                            <option>Select 3rd pitch</option>
+                            <option>Sinker</option>
+                            <option>Cutter</option>
+                            <option>Curveball</option>
+                            <option>Slider</option>
+                            <option>Changeup</option>
+                            <option>Splitter</option>
+                            <option>Forkball</option>
+                            <option>Circle Change</option>
+                            <option>Screwball</option>
+                        </select>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Pitch 3 Rating</td>
+                    <td><span id="tdrMin">0</span></td>
+                    <td><input type="number" min="5" max="115" default="5" step="1" id="tdr" onchange='skillChange("tdr")'/></td>
+                    <td><span id="tdrTpe">0</span></td>
+                    <td><span id="tdrMax">115</span></td>
+                </tr>
+
+                <tr>
+                    <td>Pitch 4</td>
+                    <td></td>
+                    <td colspan="2" style="max-width: 150px;">
+                        <select id="pit4" onchange='skillChange("pit4")'>
+                            <option>Select 4th pitch</option>
+                            <option>Sinker</option>
+                            <option>Cutter</option>
+                            <option>Curveball</option>
+                            <option>Slider</option>
+                            <option>Changeup</option>
+                            <option>Splitter</option>
+                            <option>Forkball</option>
+                            <option>Circle Change</option>
+                            <option>Screwball</option>
+                        </select>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Pitch 4 Rating</td>
+                    <td><span id="fdrMin">0</span></td>
+                    <td><input type="number" min="0" max="115" default="5" step="1" id="fdr" onchange='skillChange("fdr")'/></td>
+                    <td><span id="fdrTpe">0</span></td>
+                    <td><span id="fdrMax">115</span></td>
+                </tr>
+            </table>
+        </span></div>
+                </li>
+                <li>
+                    <div class="collapsible-header"><i class="material-icons">info</i>Knuckleball and Velocity Update Scale</div>
+                    <div class="collapsible-body"><span><p class="center aligned">
+                <p class="center aligned">
+                Knuckleball Pitch Skill:<br>
+                1-40: 1 TPE Per Point<br>
+                40-50: 2 TPE Per Point<br>
+                50-60: 4 TPE Per Point<br>
+                60-70: 8 TPE Per Point<br>
+                70-80: 10 TPE Per Point<br>
+                80-90: 15 TPE Per Point<br>
+                90-105: 20 TPE Per Point<br>
+                <br>
+                Pitching Velocity<br>
+                Due to the nature of the attribute, velocity has a separate scale that is simple to follow but different.<br>
+                Current Velocity Range________TPE Cost for next level<br>
+                80 - 83________30 TPE<br>
+                83 - 85________30 TPE<br>
+                84 - 86________30 TPE<br>
+                85 - 87________30 TPE<br>
+                86 - 88________30 TPE<br>
+                87 - 89________30 TPE<br>
+                88 - 90________30 TPE<br>
+                89 - 91________50 TPE<br>
+                90 - 92________50 TPE<br>
+                91 - 93________50 TPE<br>
+                92 - 94________50 TPE<br>
+                93 - 95________50 TPE<br>
+                94 - 96________50 TPE<br>
+                95 - 97________75 TPE<br>
+                96 - 98________75 TPE<br>
+                97 - 99________75 TPE<br>
+                98 - 100_______75 TPE<br>
+                99 - 101_______75 TPE<br>
+                100+__________Max Velocity</p>
+                        </span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<footer class="page-footer">
+    <div class="footer-copyright">
+        <div class="container">
+            © 2018 majesiu aka Paulo Di Stephano/Vladimir Fyodorovich/Piotr Czerkawski/Ireneusz Oliwa
+        </div>
+    </div>
+</footer>
+</body>
+</html>
